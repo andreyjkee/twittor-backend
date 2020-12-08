@@ -5,8 +5,8 @@ import { AppService } from './app.service';
 import { CommonModule } from './common/common.module';
 import { UsersModule } from './users/users.module';
 import { TweetsModule } from './tweets/tweets.module';
-import { ConversationsModule } from './conversations/conversations.module';
 import { AuthModule } from './auth/auth.module';
+import { ConversationsModule } from './conversations/conversations.module';
 
 @Module({
   imports: [
@@ -25,8 +25,8 @@ import { AuthModule } from './auth/auth.module';
     CommonModule,
     UsersModule,
     TweetsModule,
-    ConversationsModule,
     AuthModule,
+    ConversationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

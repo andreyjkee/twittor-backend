@@ -2,16 +2,19 @@ import { Controller, Get, Post, Body, Put, Param, Delete } from '@nestjs/common'
 import { TweetsService } from './tweets.service';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { UpdateTweetDto } from './dto/update-tweet.dto';
-import {ApiTags} from '@nestjs/swagger';
+import {ApiBearerAuth, ApiTags} from '@nestjs/swagger';
+import {AuthUser} from '../common/decorators/auth-user.decorator';
+import {User} from '../users/entities/user.entity';
 
 @ApiTags('tweets')
+@ApiBearerAuth()
 @Controller('tweets')
 export class TweetsController {
   constructor(private readonly tweetsService: TweetsService) {}
 
   @Post()
-  create(@Body() createTweetDto: CreateTweetDto) {
-    return this.tweetsService.create(createTweetDto);
+  create(@Body() createTweetDto: CreateTweetDto, @AuthUser() user: User) {
+    return this.tweetsService.create(createTweetDto, user);
   }
 
   @Get()
