@@ -6,6 +6,7 @@ import {LoginDto} from './dto/login.dto';
 import {AuthUser} from '../common/decorators/auth-user.decorator';
 import {User} from '../users/entities/user.entity';
 import {Public} from '../common/decorators/public.decorator';
+import {RegisterDto} from './dto/register.dto';
 
 @ApiTags('auth')
 @Controller('auth')
@@ -15,8 +16,14 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  async login(@Request() req, @Body() body: LoginDto) {
-    return this.authService.login(req.user);
+  async login(@AuthUser() user, @Body() body: LoginDto) {
+    return this.authService.login(user);
+  }
+
+  @Public()
+  @Post('/register')
+  async register(@Body() registerDto: RegisterDto) {
+    return this.authService.register(registerDto);
   }
 
   @ApiBearerAuth()
@@ -24,4 +31,5 @@ export class AuthController {
   getProfile(@AuthUser() user: User) {
     return user;
   }
+
 }

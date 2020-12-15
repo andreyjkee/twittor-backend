@@ -1,6 +1,7 @@
-import { Injectable } from '@nestjs/common';
+import {BadRequestException, Injectable} from '@nestjs/common';
 import {UsersService} from '../users/users.service';
 import {JwtService} from '@nestjs/jwt';
+import {RegisterDto} from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -23,5 +24,12 @@ export class AuthService {
       // eslint-disable-next-line @typescript-eslint/camelcase
       access_token: this.jwtService.sign(payload),
     }
+  }
+
+  async register(registerDto: RegisterDto) {
+    if (registerDto.password !== registerDto.passwordConfirm) {
+      throw new BadRequestException('Passwords don\'t match');
+    }
+    return this.usersService.create(registerDto);
   }
 }
