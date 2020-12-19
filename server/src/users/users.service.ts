@@ -1,8 +1,7 @@
-import {BadRequestException, Inject, Injectable, NotFoundException} from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import {Injectable, NotFoundException} from '@nestjs/common';
+import { UpdateProfileDto } from './dto/update-profile.dto';
 import {InjectRepository} from '@nestjs/typeorm';
-import {Repository} from 'typeorm';
+import {FindConditions, FindOneOptions, Repository} from 'typeorm';
 import {User} from './entities/user.entity';
 import {RegisterDto} from '../auth/dto/register.dto';
 import {UserProfile} from './entities/user-profile.entity';
@@ -14,42 +13,56 @@ export class UsersService {
     @InjectRepository(UserProfile) private readonly profileRepository: Repository<UserProfile>
   ) {}
 
-  async findOne(id: number): Promise<User | undefined> {
+  async findById(id: number): Promise<User | undefined> {
     return this.userRepository.findOne(id);
   }
 
-  async findByUsername(username: string): Promise<User | undefined> {
-    return this.userRepository.findOne({ username });
+  async findOne(
+    conditions: FindConditions<User>,
+    options?: FindOneOptions<User>,
+    ): Promise<User | undefined> {
+    return this.userRepository.findOne(conditions, options);
   }
 
-  async create(registerDto: RegisterDto) {
+  async create(registerDto: RegisterDto): Promise<User> {
     const {
-      passwordConfirm,
       username,
       password,
+      email,
       ...profile
     } = registerDto;
-    const existingUser = await this.findByUsername(username);
-    if (existingUser) {
-      throw new BadRequestException('Username is not available');
-    }
-    const hashedPassword = '';
-    const newUser = this.userRepository.create({ username, password });
+
+    const newUser = this.userRepository.create({ username, email, password });
     newUser.profile = this.profileRepository.create(profile);
-    await this.userRepository.save(newUser);
+    console.log(await this.profileRepository.insert(newUser.profile));
+    await this.userRepository.insert(newUser);
+    delete newUser.password;
     return newUser;
+  }
+
+  async isCredentialsTaken (registerDto: RegisterDto): Promise<{ isTaken: boolean, msg?: string }> {
+    const { username, email } = registerDto;
+    const [dbUsername, dbEmail] = await Promise.all([
+      this.findOne({ username }),
+      this.findOne({ email }),
+    ]);
+    if (dbUsername) return {
+      isTaken: true,
+      msg: `Username ${username} is not available, choose another`
+    };
+    if (dbEmail) return {
+      isTaken: true,
+      msg: `Email ${email} is already registered, choose another or login`
+    };
+    return { isTaken: false };
   }
 
   findAll() {
     return this.userRepository.find();
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto) {
-    const user = await this.userRepository.findOne({ id });
-    if (!user) {
-      throw new NotFoundException(`User ${id} not found`);
-    }
-    return this.userRepository.update({ id }, updateUserDto);
+  async updateProfile(id: number, updateProfileDto: UpdateProfileDto) {
+    return this.profileRepository.update({ id }, updateProfileDto);
   }
 
   async remove(id: number) {

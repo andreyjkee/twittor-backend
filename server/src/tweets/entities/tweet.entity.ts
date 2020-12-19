@@ -1,4 +1,4 @@
-import {Column, Entity, JoinTable, ManyToOne, PrimaryGeneratedColumn, OneToMany} from 'typeorm';
+import {Column, Entity, ManyToOne, PrimaryGeneratedColumn, OneToMany, JoinColumn} from 'typeorm';
 import {User} from '../../users/entities/user.entity';
 import { Comment } from './comment.entity';
 
@@ -11,8 +11,10 @@ export class Tweet {
   text: string;
 
   @ManyToOne(type => User, { nullable: false, onDelete: 'CASCADE' })
-  @JoinTable()
+  @JoinColumn()
   author: User;
+
+  authorId: number;
 
   @OneToMany(() => Comment, comment => comment.tweet)
   comments: Comment[];

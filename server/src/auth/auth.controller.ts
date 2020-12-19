@@ -16,19 +16,19 @@ export class AuthController {
   @Public()
   @UseGuards(LocalAuthGuard)
   @Post('/login')
-  async login(@AuthUser() user, @Body() body: LoginDto) {
+  async login(@AuthUser() user, @Body() body: LoginDto): Promise<{ access_token: string }> {
     return this.authService.login(user);
   }
 
   @Public()
   @Post('/register')
-  async register(@Body() registerDto: RegisterDto) {
+  async register(@Body() registerDto: RegisterDto): Promise<{ access_token: string }> {
     return this.authService.register(registerDto);
   }
 
   @ApiBearerAuth()
   @Get('/profile')
-  getProfile(@AuthUser() user: User) {
+  getProfile(@AuthUser() user: User): User {
     return user;
   }
 

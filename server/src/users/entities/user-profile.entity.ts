@@ -1,4 +1,4 @@
-import {Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne} from 'typeorm';
+import {Entity, Column, PrimaryGeneratedColumn, BaseEntity, OneToOne, JoinTable, JoinColumn} from 'typeorm';
 import {User} from './user.entity';
 
 @Entity()
@@ -12,9 +12,14 @@ export class UserProfile extends BaseEntity {
   @Column({ length: 30 })
   lastName: string;
 
-  @Column('text')
+  @Column('text', { nullable: true })
   bio: string;
 
-  @OneToOne(type => User, user => user.profile, { onDelete: 'CASCADE' })
+  @OneToOne(
+    type => User,
+      user => user.profile,
+    { onDelete: 'CASCADE' },
+  )
+  @JoinColumn()
   user: User;
 }

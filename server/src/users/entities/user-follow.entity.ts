@@ -1,15 +1,10 @@
 import {
   Entity,
-  Column,
   PrimaryGeneratedColumn,
-  ManyToMany,
-  OneToMany,
   BaseEntity,
-  JoinTable,
-  OneToOne,
+  JoinColumn,
   ManyToOne,
   CreateDateColumn,
-  UpdateDateColumn
 } from 'typeorm';
 import { User } from './user.entity';
 
@@ -23,10 +18,10 @@ export class UserFollow extends BaseEntity {
   createdAt: Date;
 
   @ManyToOne(() => User)
-  @JoinTable()
+  @JoinColumn()
   following: User;
 
   @ManyToOne(() => User)
-  @JoinTable()
+  @JoinColumn()
   follower: User;
 }
