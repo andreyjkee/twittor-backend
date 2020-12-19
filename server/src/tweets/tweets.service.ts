@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 import { CreateTweetDto } from './dto/create-tweet.dto';
 import { UpdateTweetDto } from './dto/update-tweet.dto';
 import {User} from '../users/entities/user.entity';
@@ -9,24 +9,32 @@ import {Repository} from 'typeorm';
 @Injectable()
 export class TweetsService {
   constructor(@InjectRepository(Tweet) private readonly tweetRepository: Repository<Tweet>) {}
-  create(createTweetDto: CreateTweetDto, user: User) {
-    const tweet =  this.tweetRepository.create({ ...createTweetDto, authorId: user.id });
-    return this.tweetRepository.save(tweet);
+  createTweet(createTweetDto: CreateTweetDto, user: User) {
+    const tweet = this.tweetRepository.create({ ...createTweetDto, author: user });
+    return this.tweetRepository.insert(tweet);
   }
 
-  findAll() {
-    return this.tweetRepository.find({ relations: ['authorId'] });
+  getTweets() {
+    return this.tweetRepository.find();
   }
 
   findOne(id: number) {
-    return `This action returns a #${id} tweet`;
+   return this.tweetRepository.findOne({ id });
   }
 
-  update(id: number, updateTweetDto: UpdateTweetDto) {
-    return `This action updates a #${id} tweet`;
+  async updateMyTweet(id: number, updateTweetDto: UpdateTweetDto, user: User) {
+    const updatedTweet = await this.tweetRepository.update({ id, author: user }, updateTweetDto);
+    if (!updatedTweet.affected) {
+      throw new NotFoundException('Tweet is not found');
+    }
+    return this.findOne(id);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} tweet`;
+  async removeMyTweet(id: number, user: User) {
+    const deleted = await this.tweetRepository.delete({ id, author: user });
+    if (!deleted.affected) {
+      throw new NotFoundException('Tweet is not found');
+    }
+    return deleted;
   }
 }

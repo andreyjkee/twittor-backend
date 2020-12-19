@@ -14,12 +14,12 @@ export class TweetsController {
 
   @Post()
   create(@Body() createTweetDto: CreateTweetDto, @AuthUser() user: User) {
-    return this.tweetsService.create(createTweetDto, user);
+    return this.tweetsService.createTweet(createTweetDto, user);
   }
 
   @Get()
   findAll() {
-    return this.tweetsService.findAll();
+    return this.tweetsService.getTweets();
   }
 
   @Get(':id')
@@ -28,12 +28,16 @@ export class TweetsController {
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() updateTweetDto: UpdateTweetDto) {
-    return this.tweetsService.update(+id, updateTweetDto);
+  update(
+    @Param('id') id: string,
+    @Body() updateTweetDto: UpdateTweetDto,
+    @AuthUser() user: User,
+  ) {
+    return this.tweetsService.updateMyTweet(+id, updateTweetDto, user);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tweetsService.remove(+id);
+  remove(@Param('id') id: string, @AuthUser() user: User) {
+    return this.tweetsService.removeMyTweet(+id, user);
   }
 }

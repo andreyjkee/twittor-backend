@@ -10,7 +10,7 @@ export class Tweet {
   @Column({ length: 270 })
   text: string;
 
-  @ManyToOne(type => User, { nullable: false, onDelete: 'CASCADE' })
+  @ManyToOne(type => User, { nullable: false, onDelete: 'CASCADE', eager: true })
   @JoinColumn()
   author: User;
 

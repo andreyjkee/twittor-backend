@@ -1,4 +1,4 @@
-import {Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
+import {Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn} from 'typeorm';
 import {User} from '../../users/entities/user.entity';
 import { Tweet } from './tweet.entity';
 
@@ -15,5 +15,6 @@ export class Comment {
   @JoinColumn()
   tweet: Tweet;
 
-  tweetId: number;
+  @Column('text')
+  text: string;
 }
